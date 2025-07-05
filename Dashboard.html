@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard - Face Recognition System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .logout-btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background: #c53030;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .info-card h2 {
+            color: #667eea;
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-card .icon {
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .info-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #2d3748;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .welcome-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .welcome-section h2 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .welcome-section p {
+            color: #666;
+            font-size: 18px;
+        }
+
+        .status-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .status-card .status-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .login-time {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .login-time p {
+            color: #4a5568;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .login-time .time {
+            color: #2d3748;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .welcome-section h2 {
+                font-size: 24px;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+            font-size: 20px;
+        }
+
+        /* No Access State */
+        .no-access {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            margin: 100px auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-access h2 {
+            color: #e53e3e;
+            margin-bottom: 20px;
+        }
+
+        .no-access a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div id="loadingState" class="loading" style="display: none;">
+        <i class="fas fa-spinner fa-spin"></i>&nbsp; Loading...
+    </div>
+
+    <div id="noAccessState" class="no-access" style="display: none;">
+        <h2>Access Denied</h2>
+        <p>You need to log in to access this page.</p>
+        <p style="margin-top: 20px;">
+            <a href="login.html">Go to Login Page</a>
+        </p>
+    </div>
+
+    <div id="dashboardContent" class="dashboard-container" style="display: none;">
+        <div class="header">
+            <div>
+                <h1>Employee Dashboard</h1>
+                <p>Face Recognition System</p>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
+        </div>
+
+        <div class="welcome-section">
+            <h2>Welcome back, <span id="welcomeName">Employee</span>!</h2>
+            <p>You've successfully logged in using face recognition</p>
+        </div>
+
+        <div class="content-grid">
+            <div class="info-card">
+                <h2>
+                    <div class="icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    Personal Information
+                </h2>
+                
+                <div class="info-item">
+                    <div class="info-label">Full Name</div>
+                    <div class="info-value" id="fullName">-</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Employee ID</div>
+                    <div class="info-value" id="employeeId">-</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Department</div>
+                    <div class="info-value" id="department">-</div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h2>
+                    <div class="icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    Login Information
+                </h2>
+                
+                <div class="info-item">
+                    <div class="info-label">Login Method</div>
+                    <div class="info-value">Face Recognition</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Confidence Score</div>
+                    <div class="info-value" id="confidence">-</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Session Status</div>
+                    <div class="info-value" style="color: #48bb78;">Active</div>
+                </div>
+            </div>
+
+            <div class="status-card">
+                <h3>Current Session</h3>
+                <div class="status-value">Active</div>
+                <div class="login-time">
+                    <p>Logged in at</p>
+                    <div class="time" id="loginTime">-</div>
+                    <p style="margin-top: 10px;">Duration: <span id="duration">0m</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Check if user is logged in
+    function checkAuth() {
+        const employeeId = sessionStorage.getItem('employeeId');
+        const employeeName = sessionStorage.getItem('employeeName');
+        const loginTime = sessionStorage.getItem('loginTime');
+
+        if (!employeeId || !employeeName) {
+            // Not logged in
+            document.getElementById('noAccessState').style.display = 'block';
+            document.getElementById('dashboardContent').style.display = 'none';
+            return false;
+        }
+
+        return true;
+    }
+
+    // Load employee data
+    function loadEmployeeData() {
+        if (!checkAuth()) return;
+
+        const employeeId = sessionStorage.getItem('employeeId');
+        const employeeName = sessionStorage.getItem('employeeName');
+        const department = sessionStorage.getItem('department') || 'Not specified';
+        const loginTime = sessionStorage.getItem('loginTime');
+        const confidence = sessionStorage.getItem('confidence');
+
+        document.getElementById('welcomeName').textContent = employeeName;
+        document.getElementById('fullName').textContent = employeeName;
+        document.getElementById('employeeId').textContent = employeeId;
+        document.getElementById('department').textContent = department;
+
+        if (confidence) {
+            document.getElementById('confidence').textContent = `${parseFloat(confidence).toFixed(2)}%`;
+        }
+
+        if (loginTime) {
+            const loginDate = new Date(loginTime);
+            document.getElementById('loginTime').textContent = loginDate.toLocaleString();
+
+            updateDuration(loginDate);
+            setInterval(() => updateDuration(loginDate), 60000); // Update every minute
+        }
+
+        document.getElementById('dashboardContent').style.display = 'block';
+        document.getElementById('noAccessState').style.display = 'none';
+    }
+
+    // Update session duration
+    function updateDuration(loginDate) {
+        const now = new Date();
+        const diff = Math.floor((now - loginDate) / 1000 / 60); // in minutes
+
+        if (diff < 60) {
+            document.getElementById('duration').textContent = `${diff}m`;
+        } else {
+            const hours = Math.floor(diff / 60);
+            const minutes = diff % 60;
+            document.getElementById('duration').textContent = `${hours}h ${minutes}m`;
+        }
+    }
+
+    // Logout
+    function logout() {
+        if (confirm('Are you sure you want to logout?')) {
+            sessionStorage.clear();
+            window.location.href = 'FaceLogin.html';
+        }
+    }
+
+    // Init on load
+    window.onload = function () {
+        loadEmployeeData();
+    };
+
+    // Auto-logout after 30 minutes inactivity
+    let inactivityTimer;
+    function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            alert('Session expired due to inactivity');
+            logout();
+        }, 30 * 60 * 1000); // 30 minutes
+    }
+
+    document.addEventListener('click', resetInactivityTimer);
+    document.addEventListener('keypress', resetInactivityTimer);
+    resetInactivityTimer();
+</script>
+
+</body>
+</html>
