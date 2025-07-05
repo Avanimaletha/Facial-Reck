@@ -341,7 +341,7 @@
         </div>
     </div>
 
-    <script>
+  <script>
     // Check if user is logged in
     function checkAuth() {
         const employeeId = sessionStorage.getItem('employeeId');
@@ -352,6 +352,12 @@
             // Not logged in
             document.getElementById('noAccessState').style.display = 'block';
             document.getElementById('dashboardContent').style.display = 'none';
+
+            // ✅ Redirect to login page after showing message
+            setTimeout(() => {
+                window.location.href = 'FaceLogin.html';
+            }, 2000); // 2 seconds delay so user sees "Access Denied" briefly
+
             return false;
         }
 
@@ -430,6 +436,7 @@
     document.addEventListener('keypress', resetInactivityTimer);
     resetInactivityTimer();
 </script>
+
 
 </body>
 </html>
