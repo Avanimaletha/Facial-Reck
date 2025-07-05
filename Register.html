@@ -230,7 +230,7 @@
         </div>
     </div>
 
-    <script>
+   <script>
     const API_URL = 'https://8phta10oc3.execute-api.ap-south-1.amazonaws.com/prod/register';
     
     const video = document.getElementById('video');
@@ -289,12 +289,7 @@
         capturedImageData = null;
     });
 
-    // ✅ This is the function to redirect after success
-    function onRegisterSuccess(department) {
-        sessionStorage.setItem('department', department);
-        window.location.href = 'Dashboard.html';
-    }
-
+    // ✅ Submission + session + redirect logic
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -334,8 +329,13 @@
                 startCameraBtn.style.display = 'inline-block';
                 capturedImageData = null;
 
-                // ✅ Only change added: redirect after success
-                onRegisterSuccess(formData.department);
+                // ✅ Save session info and redirect to dashboard
+                sessionStorage.setItem('employeeId', formData.employee_id);
+                sessionStorage.setItem('employeeName', formData.name);
+                sessionStorage.setItem('department', formData.department);
+                sessionStorage.setItem('loginTime', new Date().toISOString());
+
+                window.location.href = 'Dashboard.html';
 
             } else {
                 showMessage(data.error || 'Registration failed', 'error');
